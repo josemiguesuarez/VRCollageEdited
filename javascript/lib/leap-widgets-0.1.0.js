@@ -6,16 +6,16 @@
  * Released under the Apache-2.0 license                                       
  * http://github.com/leapmotion/leapjs-widgets/blob/master/LICENSE             
  */
-(function() {
+ (function() {
   'use strict';
 
-window.InteractablePlane = function(planeMesh, controller, options){
-  this.options = options || {};
-  this.options.cornerInteractionRadius || (this.options.cornerInteractionRadius = 20);
-  this.options.resize !== undefined    || (this.options.resize  = false);
-  this.options.moveX  !== undefined    || (this.options.moveX   = true );
-  this.options.moveY  !== undefined    || (this.options.moveY   = true );
-  this.options.moveZ  !== undefined    || (this.options.moveZ   = false );
+  window.InteractablePlane = function(planeMesh, controller, options){
+    this.options = options || {};
+    this.options.cornerInteractionRadius || (this.options.cornerInteractionRadius = 20);
+    this.options.resize !== undefined    || (this.options.resize  = false);
+    this.options.moveX  !== undefined    || (this.options.moveX   = true );
+    this.options.moveY  !== undefined    || (this.options.moveY   = true );
+    this.options.moveZ  !== undefined    || (this.options.moveZ   = false );
   this.options.highlight  !== undefined|| (this.options.highlight = true); // this can be configured through this.highlightMesh
   this.options.damping !== undefined   || (this.options.damping = 0.12); // this can be configured through this.highlightMesh
   this.options.hoverBounds !== undefined  || (this.options.hoverBounds = [0, 0.32]);  // react to hover within 3cm.
@@ -81,7 +81,9 @@ window.InteractablePlane = function(planeMesh, controller, options){
     this.watchXYIntersection();
   }
 
-  this.controller.on('frame', this.updatePosition.bind(this));
+  this.controller.on('frame', 
+      this.updatePosition.bind(this)
+    );
 
   if (this.options.highlight) this.bindHighlight();
 
@@ -121,7 +123,7 @@ window.InteractablePlane.prototype = {
       new THREE.MeshBasicMaterial({
         color: 0x81d41d
       })
-    );
+      );
     this.mesh.add(this.highlightMesh);
     // todo - this should subtract the normal
     this.highlightMesh.position.set(0,0,-0.0001);
@@ -185,8 +187,8 @@ window.InteractablePlane.prototype = {
         newPosition.add(
           this.moveProximity.intersectionPoints[intersectionKey].clone().sub(
             this.intersections[intersectionKey]
+            )
           )
-        )
 
       }
     }
@@ -287,7 +289,7 @@ window.InteractablePlane.prototype = {
         overlapPoint = this.mesh.pointOverlap(
           (new THREE.Vector3).fromArray(points[j]),
           inverseMatrix
-        );
+          );
 
         overlap = (overlapPoint && overlapPoint.z);
 
@@ -298,32 +300,32 @@ window.InteractablePlane.prototype = {
 
         if (overlap && this.previousOverlap[key] &&
            overlap * this.previousOverlap[key] < 0 // not same sign, therefore pushthrough
-        ){
+           ){
 
           if (overlap < min) min = overlap;
 
-          sumPushthrough += overlap;
-          countPushthrough++;
+        sumPushthrough += overlap;
+        countPushthrough++;
 
-        }
+      }
 
         // Don't allow changing sign, only allow setting sign/value, or unsetting/nulling it
         if ( !overlap || !this.previousOverlap[key] ||
              (overlap * this.previousOverlap[key] > 0) // We have previousOverlap set to the most recent same-sign value.
              // This is used for hover, but conveniently prevents de-hover on what would be negative values.
-        ) this.previousOverlap[key] = overlap;
+             ) this.previousOverlap[key] = overlap;
 
       }
 
-    }
+  }
 
-    return {
-      sum: sumPushthrough,
-      count: countPushthrough,
-      min: min
-    }
+  return {
+    sum: sumPushthrough,
+    count: countPushthrough,
+    min: min
+  }
 
-  },
+},
 
   // uses analytic spring equations, rather than force-based physics.
   getZPosition: function(hands, newPosition){
@@ -331,7 +333,7 @@ window.InteractablePlane.prototype = {
     var pushthrough = this.getPushthrough(
       hands,
       this.mesh.position.z - this.originalPosition.z
-    );
+      );
 
     // this spring equation works, but isin't really that great here
     //newPosition.z = (this.returnSpringK * this.originalPosition.z + pushthrough.sum * this.k ) / (this.returnSpringK + pushthrough.count * this.k);
@@ -340,11 +342,11 @@ window.InteractablePlane.prototype = {
     // Todo/note: currently, it would be better if any back-step (positive z direction) was ecluded from this update,
     // Handing it over to force-based instead.  However, the force-based simulator currently would pull it too far,
     // back in to the fingertips, causing a 60FPS flicker. :-(
-    if ( pushthrough.count > 0 ){
-      newPosition.z = pushthrough.min + this.originalPosition.z;
-    }
+      if ( pushthrough.count > 0 ){
+        newPosition.z = pushthrough.min + this.originalPosition.z;
+      }
 
-  },
+    },
 
   // Takes each of five finger tips
   // stores which side they are on, if any
@@ -354,11 +356,11 @@ window.InteractablePlane.prototype = {
   // be updated, to compensate for the mesh's rotation
   // This would probably work pretty well for flat planes. Not sure about other stuff. (e.g., 3d models which may
   // need a base rotation. Perhaps they could be childs of a plane).
-  calcZForce: function(hands){
+calcZForce: function(hands){
 
-    var pushthrough = this.getPushthrough( hands );
+  var pushthrough = this.getPushthrough( hands );
 
-    this.force.z += this.k * pushthrough.sum;
+  this.force.z += this.k * pushthrough.sum;
 
     // note that there can still be significant high-frequency oscillation for large values of returnSpringK.
     // This probably mean that we just shouldn't support high-k (as a real-world material may fracture).
@@ -368,7 +370,7 @@ window.InteractablePlane.prototype = {
 
       this.force.add(
         springDisplacement.multiplyScalar( - this.returnSpringK )
-      )
+        )
 
     }
 
@@ -384,7 +386,7 @@ window.InteractablePlane.prototype = {
 
       this.force.add(
         springDisplacement.multiplyScalar( - spring.k )
-      );
+        );
 
     }
 
@@ -420,7 +422,7 @@ window.InteractablePlane.prototype = {
       if (!meshes) return;
 
       meshes[
-        indexToBoneMeshIndex[index]
+      indexToBoneMeshIndex[index]
       ].material.color.setHex(color)
 
     };
@@ -431,7 +433,7 @@ window.InteractablePlane.prototype = {
     var proximity = this.moveProximity = this.controller.watch(
       this.mesh,
       this.interactiveEndBones
-    );
+      );
 
     // this ties InteractablePlane to boneHand plugin - probably should have callbacks pushed out to scene.
     // happens on every frame before the 'frame' event handler below
@@ -449,34 +451,34 @@ window.InteractablePlane.prototype = {
       if (!this.touched) {
         this.touched = true;
 //        console.log('touch', this.mesh.name);
-        this.emit('touch', this);
-      }
+this.emit('touch', this);
+}
 
-    }.bind(this) );
+}.bind(this) );
 
     proximity.out( function(hand, intersectionPoint, key, index){
       //console.log('out', key);
 
 //      setBoneMeshColor(hand, index, 0x222222);
-      setBoneMeshColor(hand, index, 0xffffff);
+setBoneMeshColor(hand, index, 0xffffff);
 
-      for ( var intersectionKey in this.intersections ){
+for ( var intersectionKey in this.intersections ){
 
-        if (intersectionKey === key){
-          delete this.intersections[intersectionKey];
-          break;
-        }
+  if (intersectionKey === key){
+    delete this.intersections[intersectionKey];
+    break;
+  }
 
-      }
+}
 
       // not sure why, but sometimes getting multiple 0 proximity release events
       if (proximity.intersectionCount() == 0 && this.touched) {
         this.touched = false;
 //        console.log('release', this.mesh.name, proximity.intersectionCount());
-        this.emit('release', this);
-      }
+this.emit('release', this);
+}
 
-    }.bind(this) );
+}.bind(this) );
 
   },
 
@@ -487,6 +489,7 @@ window.InteractablePlane.prototype = {
   // note: this is begging for its own class (see all the local methods defined in the constructor??)
   updatePosition: function(frame){
     if (!this.interactable) return false;
+    if(!window.ACTUALIZAR) return false;
 
     this.tempVec3.set(0,0,0);
     var moveX = false, moveY = false, moveZ = false, newPosition = this.tempVec3;
@@ -634,7 +637,7 @@ window.InteractablePlane.prototype = {
       this.cornerMeshes[i] = mesh = new THREE.Mesh(
         new THREE.SphereGeometry(this.options.cornerInteractionRadius, 32, 32),
         new THREE.MeshPhongMaterial({color: 0xffffff})
-      );
+        );
 
       mesh.visible = false;
       mesh.name = "corner-" + i; // convenience
@@ -647,22 +650,22 @@ window.InteractablePlane.prototype = {
       this.cornerProximities[i] = proximity = this.controller.watch(
         mesh,
         this.cursorPoints
-      ).in(
+        ).in(
         function(hand, displacement, key, index){
           // test - this could be the context of the proximity.
           this.mesh.material.color.setHex(0x33ee22);
         }
-      ).out(
+        ).out(
         function(){
           this.mesh.material.color.setHex(0xffffff);
         }
-      );
+        );
 
-    }
+      }
 
-    this.controller.on('hand',
-      this.checkResizeProximity.bind(this)
-    );
+      this.controller.on('hand',
+        this.checkResizeProximity.bind(this)
+        );
 
     // todo - make sure pinching on multiple corners is well-defined.  Should always take the closest one.
     // Right now it will always prefer the first-added Plane.
@@ -708,22 +711,22 @@ window.InteractablePlane.prototype = {
       if (i > 0){ // no thumb proximal
         out.push(
           [
-            (new THREE.Vector3).fromArray(finger.proximal.nextJoint),
-            (new THREE.Vector3).fromArray(finger.proximal.prevJoint)
+          (new THREE.Vector3).fromArray(finger.proximal.nextJoint),
+          (new THREE.Vector3).fromArray(finger.proximal.prevJoint)
           ]
-        );
+          );
       }
 
       out.push(
         [
-          (new THREE.Vector3).fromArray(finger.medial.nextJoint),
-          (new THREE.Vector3).fromArray(finger.medial.prevJoint)
+        (new THREE.Vector3).fromArray(finger.medial.nextJoint),
+        (new THREE.Vector3).fromArray(finger.medial.prevJoint)
         ],
         [
-          (new THREE.Vector3).fromArray(finger.distal.nextJoint),
-          (new THREE.Vector3).fromArray(finger.distal.prevJoint)
+        (new THREE.Vector3).fromArray(finger.distal.nextJoint),
+        (new THREE.Vector3).fromArray(finger.distal.prevJoint)
         ]
-      );
+        );
 
     }
 
@@ -740,7 +743,7 @@ window.InteractablePlane.prototype = {
       if (i > 0) { // no thumb proximal
         out.push(
           finger.mcpPosition
-        );
+          );
       }
 
       var endPos = finger.distal.nextJoint;
@@ -752,7 +755,7 @@ window.InteractablePlane.prototype = {
         finger.pipPosition,
         finger.dipPosition,
         offset
-      );
+        );
 
     }
 
@@ -798,7 +801,7 @@ window.InteractablePlane.prototype = {
   // used for resizing
   cursorPoints: function(hand){
     return [
-      (new THREE.Vector3).fromArray(hand.palmPosition)
+    (new THREE.Vector3).fromArray(hand.palmPosition)
     ]
   },
 
@@ -968,16 +971,16 @@ Leap.plugin('proximity', function(scope){
     var s = (new THREE.Vector3).subVectors(l2b, l2a);
 
 //    var rxs = r.cross(s);
-    var rxs = ( r.x * s.y ) - ( r.y * s.x );
+var rxs = ( r.x * s.y ) - ( r.y * s.x );
 
 
-    console.assert(!isNaN(r.x));
-    console.assert(!isNaN(r.y));
-    console.assert(!isNaN(r.z));
+console.assert(!isNaN(r.x));
+console.assert(!isNaN(r.y));
+console.assert(!isNaN(r.z));
 
-    console.assert(!isNaN(s.x));
-    console.assert(!isNaN(s.y));
-    console.assert(!isNaN(s.z));
+console.assert(!isNaN(s.x));
+console.assert(!isNaN(s.y));
+console.assert(!isNaN(s.z));
 
 //    console.assert(!isNaN(rxs.x));
 //    console.assert(!isNaN(rxs.y));
@@ -1000,7 +1003,7 @@ Leap.plugin('proximity', function(scope){
 
     return l1a.clone().add(
       r.multiplyScalar(t)
-    );
+      );
 
   };
 
@@ -1013,7 +1016,7 @@ Leap.plugin('proximity', function(scope){
       new THREE.Vector3(1,0,0),
       new THREE.Vector3(0.5,-1,0),
       new THREE.Vector3(0.5,1,0)
-    );
+      );
 
     console.assert(point);
     console.assert(point.equals(new THREE.Vector3(0.5,0,0)));
@@ -1024,7 +1027,7 @@ Leap.plugin('proximity', function(scope){
       new THREE.Vector3(1,0,0),
       new THREE.Vector3(0,0.2,0),
       new THREE.Vector3(1,0.4,0)
-    );
+      );
 
     console.assert(point === false);
 
@@ -1034,7 +1037,7 @@ Leap.plugin('proximity', function(scope){
       new THREE.Vector3(1,0,0),
       new THREE.Vector3(0,0.2,0),
       new THREE.Vector3(1,0.4,0.4)
-    );
+      );
 
     console.assert(point === false);
 
@@ -1044,7 +1047,7 @@ Leap.plugin('proximity', function(scope){
       new THREE.Vector3(1,0,0),
       new THREE.Vector3(1.5,-1,0),
       new THREE.Vector3(1.5,1,0)
-    );
+      );
 
     console.assert(point === false);
 
@@ -1055,7 +1058,7 @@ Leap.plugin('proximity', function(scope){
       new THREE.Vector3(1,0,0),
       new THREE.Vector3(0.5,-2,0),
       new THREE.Vector3(0.5,-1,0)
-    );
+      );
 
     console.assert(point === false);
 
@@ -1072,7 +1075,7 @@ Leap.plugin('proximity', function(scope){
         testIntersectionPointBetweenLines()
       },
       0
-    );
+      );
 
     options || (options = {});
     this.options = options;
@@ -1180,7 +1183,7 @@ Leap.plugin('proximity', function(scope){
               corners[(i+1) % 4],
               lastIntersectionPoint,
               intersectionPoint
-            );
+              );
 
             if (!point) continue;
 
@@ -1193,14 +1196,14 @@ Leap.plugin('proximity', function(scope){
 
 //            console.log('edge #:', i, 'line #:', j, "distance:", Math.sqrt(lengthSq) );
 
-            if (lengthSq < minLenSq){
-              minLenSq = lengthSq;
-              closestEdgeIntersectionPoint = point;
-            }
+if (lengthSq < minLenSq){
+  minLenSq = lengthSq;
+  closestEdgeIntersectionPoint = point;
+}
 
-          }
+}
 
-          if (closestEdgeIntersectionPoint) {
+if (closestEdgeIntersectionPoint) {
 
             //console.log('edge intersection', closestEdgeIntersectionPoint, "between", intersectionPoint, "and", lastIntersectionPoint);
 
@@ -1254,8 +1257,8 @@ Leap.plugin('proximity', function(scope){
 
     checkPoints: function(hand, handPoints){
       var mesh = this.mesh, length, state,
-        handPoint, meshWorldPosition = new THREE.Vector3,
-        distance = new THREE.Vector3, key;
+      handPoint, meshWorldPosition = new THREE.Vector3,
+      distance = new THREE.Vector3, key;
 
       if (! ( mesh.geometry instanceof THREE.SphereGeometry  ) ){
         console.error("Unsupported geometry", this.mesh.geometry);
@@ -1267,11 +1270,11 @@ Leap.plugin('proximity', function(scope){
 //      console.assert(!isNaN(meshWorldPosition.y));
 //      console.assert(!isNaN(meshWorldPosition.z));
 
-      for (var j = 0; j < handPoints.length; j++){
+for (var j = 0; j < handPoints.length; j++){
 
-        key = hand.id + '-' + j;
+  key = hand.id + '-' + j;
 
-        handPoint = makeVector3( handPoints[j] );
+  handPoint = makeVector3( handPoints[j] );
 //        console.assert(!isNaN(handPoint.x));
 //        console.assert(!isNaN(handPoint.y));
 //        console.assert(!isNaN(handPoint.z));
@@ -1395,11 +1398,11 @@ THREE.BoxGeometry.prototype.corners = function(){
     new THREE.Vector3,
     new THREE.Vector3,
     new THREE.Vector3
-  ]);
+    ]);
 
   var halfWidth  = this.parameters.width  / 2,
-      halfHeight = this.parameters.height / 2,
-      halfDepth  = this.parameters.depth  / 2;
+  halfHeight = this.parameters.height / 2,
+  halfDepth  = this.parameters.depth  / 2;
 
   this._corners[0].set( - halfWidth, + halfHeight, + halfDepth);
   this._corners[1].set( + halfWidth, + halfHeight, + halfDepth);
@@ -1421,10 +1424,10 @@ THREE.PlaneGeometry.prototype.corners = function(num){
     new THREE.Vector2,
     new THREE.Vector2,
     new THREE.Vector2
-  ]);
+    ]);
 
   var halfWidth  = this.parameters.width  / 2,
-      halfHeight = this.parameters.height / 2;
+  halfHeight = this.parameters.height / 2;
 
   this._corners[0].set( - halfWidth, + halfHeight);
   this._corners[1].set( + halfWidth, + halfHeight);
@@ -1449,47 +1452,47 @@ THREE.Mesh.prototype.setCorner = function(cornerNo, newCornerPosition, preserveA
     // https://s3.amazonaws.com/uploads.hipchat.com/28703/213121/yCBzmNgVxNCeqlU/scaling_box_from_corner.pdf
 //    console.assert( (this.scale.x === this.scale.y) && (this.scale.y === this.scale.z) );
 
-    var p0 = this.position,
-      d = newCornerPosition,
-      c = this.corners(cornerNo),
-      r0 = this.scale.x;
+var p0 = this.position,
+d = newCornerPosition,
+c = this.corners(cornerNo),
+r0 = this.scale.x;
 
     // test:
     d = c.clone().add(this.position);
 
     var q0 = p0.clone().sub(
       c.clone().multiplyScalar(r0)
-    );
+      );
 
 //    console.assert( !isNaN(q0.x) );
 
     // TODO: handle 0-division edge cases
     var t = - ( q0.dot(q0) - d.dot(d) + 2 * d.clone().sub(q0).dot(p0) ) /
-                      (2 * ( d.clone().sub(q0).dot(c) ) );
+    (2 * ( d.clone().sub(q0).dot(c) ) );
 
 //    console.assert( !isNaN(t) );
 
-    var p = p0.clone().add( c.clone().multiplyScalar(t) );
+var p = p0.clone().add( c.clone().multiplyScalar(t) );
 
-    var r = q0.clone().sub(p0).length();
+var r = q0.clone().sub(p0).length();
 //    var r = q0.clone().sub(p0).divide(c).length();
 //    var r = p0.clone().sub(q0).divide(c).length();
 
 
-    console.log(p0, p);
-    console.log(r0, r);
+console.log(p0, p);
+console.log(r0, r);
 
 //    console.assert(r === r0);
 //    console.assert(this.position.equals(p));
 
-    this.position.copy(p);
+this.position.copy(p);
 
-    this.scale.set(r, r, r);
+this.scale.set(r, r, r);
 
-  }else {
+}else {
 
-    if (! (this.geometry instanceof THREE.PlaneGeometry)) {
-      throw "Non planar geometries not currently supported";
+  if (! (this.geometry instanceof THREE.PlaneGeometry)) {
+    throw "Non planar geometries not currently supported";
       // Not that it would be too hard.  This originally supported Boxes as well, but they werent' necessary.
     }
 
@@ -1504,14 +1507,14 @@ THREE.Mesh.prototype.setCorner = function(cornerNo, newCornerPosition, preserveA
           newCornerPosition.clone().sub(this.position).divide(c)
           ).add(this.scale)
         ).divideScalar(2)
-    );
+      );
 
     // p'
     this.position.copy(
       newCornerPosition.clone().sub(
         this.scale.clone().multiply(c)
-      )
-    );
+        )
+      );
 
   }
 
@@ -1560,7 +1563,7 @@ THREE.CircleGeometry.prototype.area = function () {
 };
 
 THREE.Mesh.prototype.border = function(lineMaterial){
-  
+
   var lineGeo = new THREE.Geometry();
   lineGeo.vertices.push(
     this.geometry.corners()[0],
@@ -1573,7 +1576,7 @@ THREE.Mesh.prototype.border = function(lineMaterial){
     this.geometry.corners()[6],
     this.geometry.corners()[7],
     this.geometry.corners()[4]
-  );
+    );
 
   this.add(new THREE.Line(lineGeo, lineMaterial));
 
@@ -1581,14 +1584,14 @@ THREE.Mesh.prototype.border = function(lineMaterial){
   lineGeo.vertices.push(
     this.geometry.corners()[1],
     this.geometry.corners()[5]
-  );
+    );
   this.add(new THREE.Line(lineGeo, lineMaterial));
 
   lineGeo = new THREE.Geometry();
   lineGeo.vertices.push(
     this.geometry.corners()[2],
     this.geometry.corners()[6]
-  );
+    );
 
   this.add(new THREE.Line(lineGeo, lineMaterial));
 
@@ -1596,7 +1599,7 @@ THREE.Mesh.prototype.border = function(lineMaterial){
   lineGeo.vertices.push(
     this.geometry.corners()[3],
     this.geometry.corners()[7]
-  );
+    );
   this.add(new THREE.Line(lineGeo, lineMaterial));
   
 }
@@ -1650,7 +1653,7 @@ THREE.Mesh.prototype.intersectedByLine = function(lineStart, lineEnd, worldPosit
 
   var dot = lineEnd.clone().sub(lineStart).dot(
     intersectionPoint.clone().sub(lineStart)
-  );
+    );
 
   if (dot < 0) {
     this.intersectionPoint = null;
@@ -1685,7 +1688,7 @@ THREE.Mesh.prototype.pointOverlap = function(point, inverseMatrix){
 
   return this.geometry.pointOverlap(
     point.applyMatrix4(inverseMatrix)
-  )
+    )
 
 };
 
@@ -1694,13 +1697,13 @@ THREE.PlaneGeometry.prototype.pointOverlap = function(point){
   var cornerPositions = this.corners();
 
   if ( cornerPositions[3].y < point.y &&
-       point.y < cornerPositions[0].y &&
-       cornerPositions[3].x < point.x &&
-       point.x < cornerPositions[2].x ){
+   point.y < cornerPositions[0].y &&
+   cornerPositions[3].x < point.x &&
+   point.x < cornerPositions[2].x ){
 
     return point;
 
-  }
+}
 
   // We return undefined here to explicitly prevent any math. (false or null == 0).
   return undefined;

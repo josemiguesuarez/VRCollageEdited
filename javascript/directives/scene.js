@@ -2,50 +2,30 @@
 
 
 var images = [
-   "3d-abstract_hdwallpaper_steam-engine_50474.jpg                   ",
-   "52_8134_Hoentrop_2012-09-16.jpg                   ",
-   "steam-engine-4.png                          ",
-   "steam-engine-wallpaper-9.jpg                            ",
-   "LARGE-3-175 UP3618 mallet 1929.tif.jpg                   ",
-   "LARGE-3-420 oiling 9000.Tif.jpg                          ",
-   "LARGE-6 sideview 9000.Tif.jpg                            ",
-   "LARGE-7-40 depot Omaha Stimson.Tif.jpg                   ",
-   "LARGE-7-67 coach shop.tif.jpg                            ",
-   "LARGE-7-160 Durant FD 1910.tif.jpg                       ",
-   "LARGE-68-13 UP3703 mallet 1918.tif.jpg                   ",
-   "LARGE-68-80 Council Bluffs no date.jpg.jpg               ",
-   "LARGE-001347H tour buses-1.psd.jpg                       ",
-   "LARGE-1791A M10000 overhead.Tif.jpg                      ",
-   "LARGE-1802 poster BW M10000 progress.Tif.jpg             ",
-   "LARGE-5127A LA Ltd SPA semaphores.Tif.jpg                ",
-   "LARGE-10233 through the pipe.tif.jpg                     ",
-   "LARGE-14618 UP9026 Archer.tif.jpg                        ",
-   "LARGE-73069 Lane cutoff.tif.jpg                          ",
-   "LARGE-73209 4-4-2 SFA 97.tif.jpg                         ",
-   "LARGE-74688  Children's Book of Yellowstone Bears.jpg.jpg",
-   "LARGE-74690 poster Zion.tif.jpg                          ",
-   "LARGE-74694 ad Grand Canyon.Tif.jpg                      ",
-   "LARGE-504590 Joseph ag train.jpg.jpg                     ",
-   "LARGE-ag train Pilot Rock OWRN.jpg.jpg                   ",
-   "LARGE-CoP Rochester NY .tif.jpg                          ",
-   "LARGE-EHHarriman Sale of UP.tif.jpg                      ",
-   "LARGE-H7-74 Omaha Shop emp 1908.tif.jpg                  ",
-   "LARGE-LA Ltd SPA crew 3413.Tif.jpg                       ",
-   "LARGE-Lane cutoff fill .tif.jpg                          ",
-   "LARGE-lane cutoff.jpg.jpg                                ",
-   "LARGE-Mountain type 4-8-2.tif.jpg                        ",
-   "LARGE-Omaha Shop ext air 1907.tif.jpg                    ",
-   "LARGE-Omaha stores dept 1912.tif.jpg                     ",
-   "LARGE-Papio trestle construction.tif.jpg                 ",
-   "LARGE-PFE cars ice dock.tif.jpg                          ",
-   "LARGE-PFE Las Vegas 1931.tif.jpg                         ",
-   "LARGE-SPLAandSL num504.tif.jpg                           ",
-   "LARGE-Streamliner 3 locos.Tif.jpg                        ",
-   "LARGE-UP SP office KC.tif.jpg                            ",
-   "LARGE-X1729 No 4038 near Truckee.tif.jpg                 ",
-   "LARGE-X2313 Excursion Midlake.tif.jpg                    ",
-   "LARGE-Zoin Lodge opening 04-15-25.tif.jpg                "
-];
+'IMG_7318.PNG',
+'IMG_7319.PNG',
+'REF.jpg',
+'IMG_7320.PNG',
+'IMG_7321.PNG',
+'IMG_7322.PNG',
+'IMG_7323.PNG',
+'IMG_7324.PNG',
+'IMG_7325.PNG',
+'IMG_7326.PNG',
+'IMG_7327.PNG',
+'IMG_7328.PNG',
+'IMG_7329.PNG',
+'IMG_7330.PNG',
+'IMG_7331.PNG',
+'IMG_7332.PNG',
+'IMG_7333.PNG',
+'IMG_7334.PNG',
+'IMG_7335.PNG',
+'IMG_7336.PNG',
+'IMG_7337.PNG',
+'IMG_7338.PNG',
+'IMG_7339.PNG',
+'IMG_7340.PNG']
 
 
 
@@ -210,7 +190,7 @@ angular.module('directives', [])
         // for now we suffice to a boring old floor.
 
 
-        var light = new THREE.PointLight(0xffffff, 1, 1000);
+        var light = new THREE.PointLight(0xffffff, 1, 0);
         scene.add(light);
 
 
@@ -229,9 +209,9 @@ angular.module('directives', [])
         );
         dockMesh.name = "dock";
 
-        var zDepth = -300;
+        var zDepth = -500;
 
-        dockMesh.position.set(0.1, -160, zDepth);
+        dockMesh.position.set(0.1, -260, zDepth);
 
         // for now, we don't create a scrollable object, but just let it be moved in the view
         var dock = new Dock(scene, dockMesh, Leap.loopController, {
@@ -242,10 +222,14 @@ angular.module('directives', [])
           highlight: false
         });
 
-        dock.pushImage("images/landscapes/landscape1.jpg");
-        dock.pushImage("images/landscapes/landscape2.jpg");
-        dock.pushImage("images/landscapes/landscape3.jpg");
-        dock.pushImage("images/landscapes/landscape4.jpg");
+        // dock.pushImage("images/landscapes/landscape1.jpg");
+        // dock.pushImage("images/landscapes/landscape2.jpg");
+        // dock.pushImage("images/landscapes/landscape3.jpg");
+        // dock.pushImage("images/landscapes/landscape4.jpg");
+
+        for (var i = 0; i < 4-dock.images.length; i++) {
+          dock.pushImage("images/UP/" + images[(i)%images.length]);
+        };
 
 
         dock.setInteractable(false);
